@@ -98,6 +98,21 @@ public class EstudianteService {
         estudianteRepository.deleteById(id);
     }
 
+    @Transactional
+    public EstudianteResponseDTO inscribirEnCurso(Long estudianteId, Long cursoId) {
+
+        Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+
+        Curso curso = cursoRepository.findById(cursoId)
+                .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
+
+        estudiante.getCursos().add(curso); // Set evita duplicados
+        Estudiante actualizado = estudianteRepository.save(estudiante);
+
+        return convertirAResponse(actualizado);
+    }
+
     private EstudianteResponseDTO convertirAResponse(Estudiante estudiante) {
 
         EstudianteResponseDTO dto = new EstudianteResponseDTO();

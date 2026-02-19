@@ -62,4 +62,17 @@ public class EstudianteController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    @PostMapping("/{idEstudiante}/cursos/{idCurso}")
+    public ResponseEntity<EstudianteResponseDTO> inscribirEnCurso(
+            @PathVariable Long idEstudiante,
+            @PathVariable Long idCurso) {
+
+        try {
+            EstudianteResponseDTO response = estudianteService.inscribirEnCurso(idEstudiante, idCurso);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }

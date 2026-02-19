@@ -1,9 +1,12 @@
 package com.cursos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -23,11 +26,12 @@ public class Estudiante {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "estudiantes_cursos",
-            joinColumns = @JoinColumn(name = "estudiante_id"),
-            inverseJoinColumns = @JoinColumn(name = "curso_id")
+        name = "estudiantes_cursos",
+        joinColumns = @JoinColumn(name = "estudiante_id"),
+        inverseJoinColumns = @JoinColumn(name = "curso_id")
     )
-    private Set<Curso> cursos;
+    private Set<Curso> cursos = new HashSet<>();
 }

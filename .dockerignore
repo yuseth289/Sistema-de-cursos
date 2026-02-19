@@ -1,0 +1,9 @@
+.target
+.mvn
+.git
+.gitignore
+.vscode
+target
+Dockerfile
+docker-compose.yml
+*.iml
