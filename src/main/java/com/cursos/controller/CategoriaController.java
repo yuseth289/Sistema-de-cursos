@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +21,14 @@ public class CategoriaController {
     private final CategoriaService categoriaService;
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> crearCategoria(@RequestBody CategoriaRequestDTO dto) {
-        CategoriaResponseDTO response = categoriaService.crear(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> crearCategoria(@RequestBody CategoriaRequestDTO dto) {
+        try {
+            CategoriaResponseDTO response = categoriaService.crear(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(obtenerStatusDeValidacion(e))
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @GetMapping
@@ -42,13 +48,16 @@ public class CategoriaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> actualizarCategoria(
+    public ResponseEntity<?> actualizarCategoria(
             @PathVariable Long id,
             @RequestBody CategoriaRequestDTO dto) {
 
         try {
             CategoriaResponseDTO actualizado = categoriaService.actualizar(id, dto);
             return ResponseEntity.status(HttpStatus.OK).body(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(obtenerStatusDeValidacion(e))
+                    .body(Map.of("message", e.getMessage()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -62,5 +71,13 @@ public class CategoriaController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    private HttpStatus obtenerStatusDeValidacion(IllegalArgumentException e) {
+        if (e.getMessage() != null && e.getMessage().contains("existe")) {
+            return HttpStatus.CONFLICT;
+        }
+
+        return HttpStatus.BAD_REQUEST;
     }
 }
